@@ -94,3 +94,9 @@ Now you can start Postfix:
 systemctl start postfix
 ```
 Make sure to open port 25 on your firewall. However, it's recommended to allow connections only from trusted hosts.
+
+# Further information
+
+This is something new, and thus, might be still buggy. Feel free to submit your issues.
+
+Need help implementing this for your company? Feel free to [contact us](https://www.ltnconsultores.com/en/contact) (Yes, the contact form uses this software)

@@ -2,6 +2,10 @@
 <?php
 require_once("config.php");
 
+define("EX_OK",0);
+define("EX_UNAVAILABLE",69);
+define("EX_TEMPFAIL",75);
+
 $saslUser = $argv[1];	// $argv[1] containss authenticated SASL user
 // $argv[2] contains SMTP client IP
 // $argv[3] contains body size
@@ -9,6 +13,11 @@ $saslUser = $argv[1];	// $argv[1] containss authenticated SASL user
 $stdin = fopen("php://stdin","r");
 $rawbody = stream_get_contents($stdin);
 fclose($stdin);
+
+if (strlen($rawbody) < 64) {
+	echo "Empty or too small message. Exiting gracefully" . PHP_EOL;
+	eit(EX_OK);
+}
 
 if (APIMF_BACKEND == "MICROSOFT") {
 	$ch = curl_init("https://login.microsoftonline.com/" . APIMF_TENANTID . "/oauth2/v2.0/token");
@@ -21,7 +30,7 @@ if (APIMF_BACKEND == "MICROSOFT") {
 	$data = json_decode($data);
 	if (isset($data->error)) {
 		echo "Graph Authentication Error: " . $data->error_description . PHP_EOL;
-		exit(-1);
+		exit(EX_TEMPFAIL);
 	}
 	$authToken = $data->access_token;
 	unset($reply);
@@ -44,11 +53,11 @@ if (APIMF_BACKEND == "MICROSOFT") {
 
 	if ($code != "202") {
 		echo "Failed to send message: {$code}: {$data}" . PHP_EOL;
-		exit(-2);
+		exit(APIMF_ONERROR_DEFER ? EX_TEMPFAIL : EX_OK);
 	}
 
 	exit(0);
 }
 
 echo "Unsupported backend" . PHP_EOL;
-exit(-250);
+exit(EX_OK);
