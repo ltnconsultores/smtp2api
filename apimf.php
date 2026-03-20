@@ -20,9 +20,9 @@ if (strlen($rawbody) < 64) {
 }
 
 if (APIMF_BACKEND == "MICROSOFT") {
-	$ch = curl_init("https://login.microsoftonline.com/" . APIMF_TENANTID . "/oauth2/v2.0/token");
+	$ch = curl_init("https://login.microsoftonline.com/" . APIMF_MS_TENANTID . "/oauth2/v2.0/token");
 	curl_setopt($ch,CURLOPT_POST,1);
-	curl_setopt($ch,CURLOPT_POSTFIELDS,"client_id=" . APIMF_CLIENTID . "&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&client_secret=" . APIMF_CLIENTSECRET . "&grant_type=client_credentials");
+	curl_setopt($ch,CURLOPT_POSTFIELDS,"client_id=" . APIMF_MS_CLIENTID . "&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&client_secret=" . APIMF_MS_CLIENTSECRET . "&grant_type=client_credentials");
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 	$data = curl_exec($ch);
 	$code = curl_getinfo($ch,CURLINFO_RESPONSE_CODE);
@@ -51,7 +51,30 @@ if (APIMF_BACKEND == "MICROSOFT") {
 	$code = curl_getinfo($ch,CURLINFO_RESPONSE_CODE);
 	curl_close($ch);
 
-	if ($code != "202") {
+	if ($code != 202) {
+		echo "Failed to send message: {$code}: {$data}" . PHP_EOL;
+		exit(APIMF_ONERROR_DEFER ? EX_TEMPFAIL : EX_OK);
+	}
+
+	exit(0);
+} else if (APIMF_BACKEND == "GOOGLE") {
+	$ch = curl_init("https://gmail.googleapis.com/gmail/v1/users/me/messages/send");
+	curl_setopt($ch,CURLOPT_POST,1);
+	$eb = '{"raw":"' . rtrim(strtr(base64_encode($rawbody),"+/","-_"),"=") . '"}';
+	curl_setopt($ch,CURLOPT_POSTFIELDS,$eb);
+	$headers = [
+		"Authorization: Bearer " . APIMF_GOOGLE_AUTHTOKEN,
+		"Content-Length: " . strlen($eb),
+		"Content-Type: application/json",
+	];
+	unset($eb);
+	curl_setopt($ch,CURLOPT_HTTPHEADER,$headers);
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	$data = curl_exec($ch);
+	$code = curl_getinfo($ch,CURLINFO_RESPONSE_CODE);
+	curl_close($ch);
+
+	if ($code != 200) {
 		echo "Failed to send message: {$code}: {$data}" . PHP_EOL;
 		exit(APIMF_ONERROR_DEFER ? EX_TEMPFAIL : EX_OK);
 	}

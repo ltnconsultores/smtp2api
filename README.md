@@ -9,9 +9,9 @@ Because both Microsoft and Google have deprecated (and, in some cases, disabled)
 
 # Features
 
-- SASL Authentication
-- Support for Microsoft Graph API
-- (Future) Support for Google GMail API
+- Basic SMTP Authentication, ideal for legacy apps and systems
+- Support for Microsoft Graph API, for usage with Exchange Online
+- Support for Google GMail API (experimental)
 
 # Requirements
 

@@ -8,14 +8,13 @@ define("APIMF_DOMAIN","");
 // Note: API authentication errors always defer the message
 define("APIMF_ONERROR_DEFER",false);
 
-// Backend API. Currently only MICROSOFT is supported
+// Backend API. Supported options are MICROSOFT and GOOGLE
 define("APIMF_BACKEND","MICROSOFT");
 
-// AAD Tenant ID
-define("APIMF_TENANTID","");
+// Microsoft-specific parameters
+define("APIMF_MS_TENANTID","");	// AAD Tenand ID "Directory (tenant) ID"
+define("APIMF_MS_CLIENTID","");	// AAD Client ID "Application (client) ID:"
+define("APIMF_MS_CLIENTSECRET","");	// AAD Secret Value
 
-// AAD App Client ID
-define("APIMF_CLIENTID","");
-
-// AAD App Client Secret
-define("APIMF_CLIENTSECRET","");
+// Google
+define("APIMF_GOOGLE_AUTHTOKEN","");	// Authentication token
